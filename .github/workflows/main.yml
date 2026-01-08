@@ -1,0 +1,59 @@
+# 工作流名称
+name: Weibo Crawler
+
+# 触发规则：每小时执行 + 手动触发
+on:
+  # 定时触发（cron表达式，UTC时间，需转换为北京时间：UTC+8）
+  schedule:
+    - cron: '0 * * * *'  # 每小时整点执行（UTC时间），对应北京时间 8点、9点...
+  # 手动触发（便于测试）
+  workflow_dispatch:
+
+# 工作流任务
+jobs:
+  crawl:
+    # 运行环境：Ubuntu最新版
+    runs-on: ubuntu-latest
+    
+    # 任务步骤
+    steps:
+      # 步骤1：拉取仓库代码
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # 步骤2：设置Python环境
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'  # 推荐3.9+，兼容Playwright
+      
+      # 步骤3：安装Python依赖
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      # 步骤4：安装Playwright浏览器（Chromium）
+      - name: Install Playwright browsers
+        run: |
+          playwright install chromium --with-deps
+      
+      # 步骤5：执行爬虫脚本（传递Secrets作为环境变量）
+      - name: Run crawler
+        env:
+          # 从GitHub Secrets加载环境变量
+          SEND_EMAIL: ${{ secrets.SEND_EMAIL }}
+          SEND_PASSWORD: ${{ secrets.SEND_PASSWORD }}
+          RECEIVE_EMAIL: ${{ secrets.RECEIVE_EMAIL }}
+        run: |
+          python weibo_email.py
+      
+      # 步骤6：上传日志文件（可选，便于排查问题）
+      - name: Upload logs
+        if: always()  # 无论任务成功/失败都上传
+        uses: actions/upload-artifact@v4
+        with:
+          name: crawl-logs
+          path: |
+            weibo_crawl_logs/
+            *.json
