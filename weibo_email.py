@@ -17,7 +17,7 @@ TARGET_URL = "https://m.weibo.cn/u/1812511224?jumpfrom=weibocom"
 # 定时爬取间隔（秒）- 1小时
 INTERVAL = 3600
 # 筛选时间范围（小时）
-TIME_RANGE_HOURS = 1
+TIME_RANGE_HOURS = 2
 
 import os 
 # 邮件配置（请修改为你的实际信息）
@@ -210,7 +210,7 @@ def send_email_with_attachment(file_path: str, crawl_count: int):
 
 
 async def crawl_weibo():
-    """爬取微博核心逻辑（含1小时筛选+邮件发送）"""
+    """爬取微博核心逻辑（含2小时筛选+邮件发送）"""
     crawl_datetime = datetime.now()
     time_threshold = crawl_datetime - timedelta(hours=TIME_RANGE_HOURS)
     json_file_path = ""
@@ -335,7 +335,7 @@ async def crawl_weibo():
                 # 发送邮件
                 send_email_with_attachment(json_file_path, len(crawl_result))
             else:
-                logger.warning("暂无1小时内的新微博内容")
+                logger.warning("暂无2小时内的新微博内容")
 
         except Exception as e:
             logger.error(f"爬取主流程失败：{str(e)}", exc_info=True)
