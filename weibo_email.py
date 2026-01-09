@@ -17,7 +17,7 @@ TARGET_URL = "https://m.weibo.cn/u/1812511224?jumpfrom=weibocom"
 # 定时爬取间隔（秒）- 1小时
 INTERVAL = 3600
 # 筛选时间范围（小时）
-TIME_RANGE_HOURS = 2
+TIME_RANGE_HOURS = 5
 
 import os 
 # 邮件配置（请修改为你的实际信息）
